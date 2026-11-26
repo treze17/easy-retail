@@ -1,0 +1,72 @@
+<%- include('partials/header')-%>
+<form action="/signup" method="POST">
+    <h2>signup</h2>
+    <label for="firstname">FirstName</label>
+    <input type="text" name="first-name" class="firstname">
+    <div class="firstname error"></div>
+
+    <label for="lastname">LastName</label>
+    <input type="text" name="last-name" class="lastname">
+    <div class="lastname error"></div>
+
+    <label for="email">email</label>
+    <input type="text" name="email" class="email">
+    <div class="email error"></div>
+
+    <label for="password">password</label>
+    <input type="password" name="password" class="password">
+    <div class="password error"></div>
+    <button>signup</button>
+</form>
+<%- include('partials/footer')-%>
+
+<script>
+    const form = document.querySelector('form')
+
+    // Inputs
+    const firstname = form['first-name']
+    const lastname = form['last-name']
+    const email = form.email
+    const password = form.password
+
+    // Error views (no space between classes)
+    const emailError = document.querySelector('.email.error')
+    const passError = document.querySelector('.password.error')
+    const firstNameError = document.querySelector('.firstname.error')
+    const lastNameError = document.querySelector('.lastname.error')
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault()
+
+        firstNameError.textContent = ''
+        lastNameError.textContent = ''
+        emailError.textContent = ''
+        passError.textContent = ''
+
+        try {
+            const resp = await fetch('/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    firstname: firstname.value,
+                    lastname: lastname.value,
+                    email: email.value,
+                    password: password.value
+                })
+            })
+
+            const data = await resp.json()
+            if (data.errors) {
+                console.log(data.errors)
+                firstNameError.textContent = data.errors.firstname
+                lastNameError.textContent = data.errors.lastname
+                emailError.textContent = data.errors.email
+                passError.textContent = data.errors.password
+            } else {
+                console.log(data)
+            }
+        } catch (error) {
+            console.log(error.message)
+        }
+    })
+</script>

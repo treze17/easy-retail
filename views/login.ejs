@@ -1,0 +1,67 @@
+<%- include('partials/header')-%>
+<form action="/login" method="POST">
+    <h2>login</h2>
+  
+    <label for="name">email</label>
+    <input type="text" name="email">
+    <div class="email error"></div>
+
+    <label for="name">password</label>
+    <input type="password" name="password">
+    <div class="password error"></div>
+    <button>signup</button> <button id="forgotPass">forgot password</button>
+</form>
+<%- include('partials/footer')-%>
+<script>
+ const form = document.querySelector('form')
+
+    // Inputs
+   
+    const email = form.email
+    const password = form.password
+    const forgot_pass = document.getElementById('forgotPass')
+
+    forgot_pass.addEventListener('click',(e)=>{
+      e.preventDefault()
+      location.assign('/forgot-password')
+    })
+  
+
+    // Error views (no space between classes)
+    const emailError = document.querySelector('.email.error')
+    const passError = document.querySelector('.password.error')
+   
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault()
+
+       
+        emailError.textContent = ''
+        passError.textContent = ''
+
+        try {
+            const resp = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  
+                    email: email.value,
+                    password: password.value
+                })
+            })
+
+            const data = await resp.json()
+            if (data.errors) {
+                console.log(data.errors)
+               
+                emailError.textContent = data.errors.email || ''
+                passError.textContent = data.errors.password || ''
+            } else {
+                console.log(data)
+               location.assign('/')
+            }
+        } catch (error) {
+            console.log(error,'issues connecting the server')
+        }
+    })
+</script>
